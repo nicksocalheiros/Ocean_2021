@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">		
+		<title>RegsBlock-OCEAN</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="index.css">
+		<script src="js/web3.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+	</head>
+
+	<body>
+
+		<div class="main">
+			<div class="menu">
+				<h2>Consultar Produtos</h2>
+				
+				<ul>	
+                    <li> <a href="index.html" class="nounderline"> Cadastro de Produtos </a> </li>
+                    <li> <a href="consulta.html" class="nounderline"> Consultar Produtos </a> </li>                  
+                    <li> <a href="sobre.html" class="nounderline"> Transações Pendentes </a> </li>
+				</ul>
+			</div>
+					
+
+			<div class="content">
+                	
+        		
+				<div class="content-inner">
+					<div class="header">Produtos a venda</div> 
+					
+					<table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Preço</th>
+                            <th scope="col">L.Plantação</th>
+                            <th scope="col">L.Método</th>
+                            <th scope="col">Data Plantação</th>
+                            <th scope="col">Data Colheita</th>
+                            <th scope="col">Ações</th>
+                          </tr>
+                        </thead>
+                        <tbody id="aqui">
+                        </tbody>
+                      </table>
+						
+					
+					
+					
+					<div id="barra"> </div>
+					
+				</div>
+
+				<div class="espacamento"></div>
+				
+			</div>
+
+			
+			<br style="clear:both">
+			
+			<div class="footer">
+				
+			</div>
+
+		</div>
+
+
+		
+		<script>
+
+				if (typeof web3 !== 'undefined') {
+					web3 = new Web3(web3.currentProvider);
+				} else {
+					 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+				}
+			 
+		
+			web3.eth.getAccounts(function(err, accounts){
+			if (err != null) {
+			  console.log(err);
+			}
+			else if (accounts.length === 0) {  
+			  console.log('MetaMask is locked');
+			}
+			else {
+			 web3.eth.defaultAccount = accounts[0];
+			}
+		   });
+
+			
+		   const endereco = '0xB86E9A6Bc232523eCfAEF4Fb592b92Fc51225309';
+
+ 			const abi = [
+	{
+		"inputs": [],
+		"stateMutability": "payable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [],
+		"name": "alerta",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_id",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_status",
+				"type": "uint256"
+			}
+		],
+		"name": "atualizarStatus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "transacaoId",
+				"type": "uint256"
+			}
+		],
+		"name": "delivery",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "productId",
+				"type": "uint256"
+			}
+		],
+		"name": "enviarTransacao",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getCasos",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "nome",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "preco",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "dono",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "fazendeiro",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "plantacaoLoc",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "plantacaoMet",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "plantacaoData",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "colheitaData",
+						"type": "string"
+					},
+					{
+						"internalType": "enum RBCContract.Status",
+						"name": "status",
+						"type": "uint8"
+					}
+				],
+				"internalType": "struct RBCContract.Produto[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "transacaoId",
+				"type": "uint256"
+			}
+		],
+		"name": "getOrder",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "productId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "buyer",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "delivered",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct RBCContract.Transacao",
+				"name": "transacao",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getOrders",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "productId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "buyer",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "delivered",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct RBCContract.Transacao[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "productId",
+				"type": "uint256"
+			}
+		],
+		"name": "getProduct",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "nome",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "tipo",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "preco",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "dono",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "fazendeiro",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "plantacaoLoc",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "plantacaoMet",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "plantacaoData",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "colheitaData",
+						"type": "string"
+					},
+					{
+						"internalType": "enum RBCContract.Status",
+						"name": "status",
+						"type": "uint8"
+					}
+				],
+				"internalType": "struct RBCContract.Produto",
+				"name": "produto",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getQtdCasos",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "length",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "productId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "delivered",
+				"type": "bool"
+			}
+		],
+		"name": "historicoTransacao",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_nome",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_tipo",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_preco",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_plantacaoLoc",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_plantacaoMet",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_plantacaoData",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_colheitaData",
+				"type": "string"
+			}
+		],
+		"name": "inserirProduto",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "mostSent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+
+			
+			
+			var rbc = new web3.eth.Contract(abi,endereco)
+			
+			rbc.methods.getCasos().call()
+        	.then((result) => {
+            	result.forEach((element, index) => {
+				console.log(element.dono);
+				console.log(element);
+					if (element.status == '0' && (element.dono == element.fazendeiro)) {
+                    $('#aqui').append(`<tr><th>${index + 1}</th>
+									<td>${element.nome}</td>
+									<td>${element.tipo}</td>
+									<td>${element.preco}</td>
+									<td>${element.plantacaoLoc}</td>
+									<td>${element.plantacaoMet}</td>
+									<td>${element.plantacaoData}</td>
+									<td>${element.colheitaData}</td>
+									<td><button type="submit" id="button1"  value="${[parseInt(index)+'|'+parseInt(element.preco,10)]}" onclick="comprar(this.value)" class="btn btn-primary" style="width:auto">Comprar</button></td>
+									</tr> `);
+
+                }
+            });
+
+        })
+
+    	function comprar(itens) {
+        	var dados = itens.split('|');
+        	rbc.methods.enviarTransacao(parseInt(dados[0])).send({from:web3.eth.defaultAccount,value:parseInt(dados[1])}).then(
+            	(result)=>{
+                	alert("Inicio da Transação\nO pedido foi enviada para o vendedor\nAguarde a confirmação da transação !")
+            }
+        )
+    }
+				
+			</script>
+
+
+	</body>
+	
+</html>
